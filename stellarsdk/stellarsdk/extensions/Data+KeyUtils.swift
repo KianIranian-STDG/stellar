@@ -30,7 +30,7 @@ extension Data {
         var versionByteRaw = versionByte.rawValue
         let versionByteData = Data(bytes: &versionByteRaw, count: MemoryLayout.size(ofValue: versionByte))
         let payload = NSMutableData(data: versionByteData)
-        payload.append(Data(bytes: self.bytes))
+        payload.append(Data(self.bytes))
         let checksumedData = (payload as Data).crc16Data()
         
         return checksumedData.base32EncodedString

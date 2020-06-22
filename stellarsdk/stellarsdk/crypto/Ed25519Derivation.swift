@@ -13,10 +13,14 @@ public struct Ed25519Derivation {
     public let raw: Data
     public let chainCode: Data
     
-    public init(seed: Data) {
-        let output = HDCrypto.HMACSHA512(key: "ed25519 seed".data(using: .utf8)!, data: seed)
-        self.raw = output[0..<32]
-        self.chainCode = output[32..<64]
+    public init(seed: Data) throws {
+        do {
+            let output = try HDCrypto.HMACSHA512(key: "ed25519 seed".data(using: .utf8)!, data: seed)
+            self.raw = output[0..<32]
+            self.chainCode = output[32..<64]
+        } catch {
+            throw StellarError.Error
+        }
     }
     
     private init(privateKey: Data, chainCode: Data) {
@@ -24,26 +28,30 @@ public struct Ed25519Derivation {
         self.chainCode = chainCode
     }
     
-    public func derived(at index: UInt32) -> Ed25519Derivation {
-        let edge: UInt32 = 0x80000000
-        guard (edge & index) == 0 else { fatalError("Invalid index") }
-        
-        var data = Data()
-        data += UInt8(0)
-        data += raw
-        
-        let derivingIndex = edge + index
-        data += derivingIndex.bigEndian
-        
-        let digest = HDCrypto.HMACSHA512(key: chainCode, data: data)
-        let factor = BInt(data: digest[0..<32])
-        
-        let derivedPrivateKey = factor.data
-        let derivedChainCode = digest[32..<64]
-        
-        return Ed25519Derivation (
-            privateKey: derivedPrivateKey,
-            chainCode: derivedChainCode
-        )
+    public func derived(at index: UInt32) throws -> Ed25519Derivation {
+        do {
+            let edge: UInt32 = 0x80000000
+            guard (edge & index) == 0 else { fatalError("Invalid index") }
+            
+            var data = Data()
+            data += UInt8(0)
+            data += raw
+            
+            let derivingIndex = edge + index
+            data += derivingIndex.bigEndian
+            
+            let digest = try HDCrypto.HMACSHA512(key: chainCode, data: data)
+            let factor = BInt(data: digest[0..<32])
+            
+            let derivedPrivateKey = factor.data
+            let derivedChainCode = digest[32..<64]
+            
+            return Ed25519Derivation (
+                privateKey: derivedPrivateKey,
+                chainCode: derivedChainCode
+            )
+        } catch {
+            throw StellarError.Error
+        }
     }
 }

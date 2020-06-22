@@ -71,6 +71,7 @@ class ServiceHelper: NSObject {
     /// - parameter path:  A path relative to the baseURL. If URL parameters have to be sent they can be encoded in this parameter as you would do it with regular URLs.
     /// - parameter response:   The closure to be called upon response.
     open func GETRequestWithPath(path: String, completion: @escaping ResponseClosure) {
+        print("=-=-=-==-=-=-", baseURL + path)
         requestFromUrl(url: baseURL + path, method:.get, completion:completion)
     }
 

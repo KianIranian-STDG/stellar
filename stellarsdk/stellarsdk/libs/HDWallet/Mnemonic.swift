@@ -43,7 +43,7 @@ public final class Mnemonic {
     }
 
     
-    public static func createSeed(mnemonic: String, withPassphrase passphrase: String = "") -> Data {
+    public static func createSeed(mnemonic: String, withPassphrase passphrase: String = "") throws-> Data {
         guard let password = mnemonic.decomposedStringWithCompatibilityMapping.data(using: .utf8) else {
             fatalError("Nomalizing password failed in \(self)")
         }
@@ -52,7 +52,11 @@ public final class Mnemonic {
             fatalError("Nomalizing salt failed in \(self)")
         }
         
-        return HDCrypto.PBKDF2SHA512(password: password.bytes, salt: salt.bytes)
+        do {
+            return try HDCrypto.PBKDF2SHA512(password: password.bytes, salt: salt.bytes)
+        }catch {
+            throw StellarError.Error
+        }
     }
 }
 

@@ -8,23 +8,26 @@
 
 import Foundation
 
+
 final class HDCrypto {
-    static func HMACSHA512(key: Data, data: Data) -> Data {
+    static func HMACSHA512(key: Data, data: Data) throws -> Data {
         let output: [UInt8]
         do {
             output = try HMAC(key: key.bytes, variant: .sha512).authenticate(data.bytes)
         } catch let error {
-            fatalError("Error occured. Description: \(error.localizedDescription)")
+            throw StellarError.Error
+//            fatalError("Error occured. Description: \(error.localizedDescription)")
         }
         return Data(output)
     }
     
-    static func PBKDF2SHA512(password: [UInt8], salt: [UInt8]) -> Data {
+    static func PBKDF2SHA512(password: [UInt8], salt: [UInt8]) throws -> Data {
         let output: [UInt8]
         do {
             output = try PKCS5.PBKDF2(password: password, salt: salt, iterations: 2048, variant: .sha512).calculate()
         } catch let error {
-            fatalError("PKCS5.PBKDF2 faild: \(error.localizedDescription)")
+//            fatalError("PKCS5.PBKDF2 faild: \(error.localizedDescription)")
+            throw StellarError.Error
         }
         return Data(output)
     }

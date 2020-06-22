@@ -28,21 +28,26 @@ public final class Wallet {
     /// - Parameter index: The index of the wallet to generate.
     ///
     public static func createKeyPair(mnemonic: String, passphrase: String?, index: Int) throws -> KeyPair {
-        var bip39Seed: Data!
         
-        if let passphraseValue = passphrase, !passphraseValue.isEmpty {
-            bip39Seed = Mnemonic.createSeed(mnemonic: mnemonic, withPassphrase: passphraseValue)
-        } else {
-            bip39Seed = Mnemonic.createSeed(mnemonic: mnemonic)
+        do {
+            var bip39Seed: Data!
+            
+            if let passphraseValue = passphrase, !passphraseValue.isEmpty {
+                bip39Seed = try Mnemonic.createSeed(mnemonic: mnemonic, withPassphrase: passphraseValue)
+            } else {
+                bip39Seed = try Mnemonic.createSeed(mnemonic: mnemonic)
+            }
+            
+            let masterPrivateKey = try Ed25519Derivation(seed: bip39Seed)
+            let purpose = try masterPrivateKey.derived(at: 44)
+            let coinType = try purpose.derived(at: 148)
+            let account = try coinType.derived(at: UInt32(index))
+            let stellarSeed = try Seed(bytes: account.raw.bytes)
+            let keyPair = KeyPair.init(seed: stellarSeed)
+            
+            return keyPair
+        }catch {
+            throw StellarError.Error
         }
-        
-        let masterPrivateKey = Ed25519Derivation(seed: bip39Seed)
-        let purpose = masterPrivateKey.derived(at: 44)
-        let coinType = purpose.derived(at: 148)
-        let account = coinType.derived(at: UInt32(index))
-        let stellarSeed = try! Seed(bytes: account.raw.bytes)
-        let keyPair = KeyPair.init(seed: stellarSeed)
-        
-        return keyPair
     }
 }

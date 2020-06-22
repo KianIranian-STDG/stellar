@@ -962,7 +962,7 @@ fileprivate extension String
 
 		for char in number.reversed()
 		{
-			if let digit = chars.index(of: char)
+			if let digit = chars.firstIndex(of: char)
 			{
 				precondition(digit < from)
 
@@ -2286,13 +2286,13 @@ public struct BDouble:
 		if let bi = BInt(nStr) {
 			self.init(bi, over: 1)
 		} else {
-			if let exp = nStr.index(of: "e")?.encodedOffset
+			if let exp = nStr.firstIndex(of: "e")?.encodedOffset
 			{
 				let beforeExp = String(Array(nStr)[..<exp].filter{ $0 != "." })
 				var afterExp = String(Array(nStr)[(exp + 1)...])
 				var sign = false
 
-				if let neg = afterExp.index(of: "-")?.encodedOffset
+				if let neg = afterExp.firstIndex(of: "-")?.encodedOffset
 				{
 					afterExp = String(Array(afterExp)[(neg + 1)...])
 					sign = true
@@ -2318,7 +2318,7 @@ public struct BDouble:
 				}
 			}
 
-			if let io = nStr.index(of: ".")
+			if let io = nStr.firstIndex(of: ".")
 			{
 				let i = io.encodedOffset
 

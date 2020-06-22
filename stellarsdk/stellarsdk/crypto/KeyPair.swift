@@ -9,6 +9,10 @@
 import Foundation
 import ed25519C
 
+
+enum StellarError: Error {
+    case Error
+}
 /// Holds a Stellar keypair.
 public final class KeyPair {
     public let publicKey: PublicKey
@@ -60,8 +64,12 @@ public final class KeyPair {
     ///
     /// - Parameter secretSeed: the Stellar secret seed.
     public convenience init(secretSeed: String) throws {
-        let seedFromSecret = try Seed(secret:secretSeed)
-        self.init(seed: seedFromSecret)
+        do {
+            let seedFromSecret = try Seed(secret:secretSeed)
+            self.init(seed: seedFromSecret)
+        } catch {
+            throw StellarError.Error
+        }
     }
     
     /// Creates a new KeyPair without a private key. Useful e.g. to simply verify a signature from a given public address
@@ -127,7 +135,7 @@ public final class KeyPair {
             }
         }
      
-        return SignerKeyXDR.ed25519(WrappedData32(Data(bytes: pubBuffer)))
+        return SignerKeyXDR.ed25519(WrappedData32(Data(pubBuffer)))
      }
     
     /// Sign the provided data with the keypair's private key.

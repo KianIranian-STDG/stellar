@@ -117,7 +117,7 @@ extension Data: XDRCodable {
     
     public init(fromBinary decoder: XDRDecoder) throws {
         let bytes: [UInt8] = try Array(fromBinary: decoder)
-        self.init(bytes: bytes)
+        self.init(bytes)
         
         if bytes.count % 4 != 0 {
             _ = try (0..<(4 - bytes.count % 4)).forEach { _ in try _ = UInt8(fromBinary: decoder) }
@@ -126,7 +126,7 @@ extension Data: XDRCodable {
     
     public init(fromBinary xdrDecoder: XDRDecoder, count: Int) throws {
         let bytes: [UInt8] = try Array(fromBinary: xdrDecoder, count: count)
-        self.init(bytes: bytes)
+        self.init(bytes)
     }
 }
 

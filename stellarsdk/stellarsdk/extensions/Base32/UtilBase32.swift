@@ -44,13 +44,13 @@ public func base32HexEncode(_ data: Data) -> String {
 
 public func base32DecodeToData(_ string: String) -> Data? {
     return base32decode(string, alphabetDecodeTable).flatMap {
-        Data(bytes: UnsafePointer<UInt8>($0), count: $0.count)
+        Data(bytes: ($0), count: $0.count)
     }
 }
 
 public func base32HexDecodeToData(_ string: String) -> Data? {
     return base32decode(string, extendedHexAlphabetDecodeTable).flatMap {
-        Data(bytes: UnsafePointer<UInt8>($0), count: $0.count)
+        Data(bytes: ($0), count: $0.count)
     }
 }
 
@@ -241,7 +241,7 @@ internal func base32decode(_ string: String, _ table: [UInt8]) -> [UInt8]? {
     
     // validate string
     let leastPaddingLength = getLeastPaddingLength(string)
-    if let index = string.unicodeScalars.index(where: {$0.value > 0xff || table[Int($0.value)] > 31}) {
+    if let index = string.unicodeScalars.firstIndex(where: {$0.value > 0xff || table[Int($0.value)] > 31}) {
         // index points padding "=" or invalid character that table does not contain.
         let pos = string.unicodeScalars.distance(from: string.unicodeScalars.startIndex, to: index)
         // if pos points padding "=", it's valid.

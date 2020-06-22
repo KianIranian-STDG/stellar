@@ -86,7 +86,7 @@ public class Federation: NSObject {
     
     /// Resolves the given address to federation record if the user was found for a given Stellar address.
     public func resolve(address: String, completion:@escaping ResolveClosure) {
-        guard let _ = address.index(of: "*") else {
+        guard let _ = address.firstIndex(of: "*") else {
             completion(.failure(error: .invalidAddress))
             return
         }
